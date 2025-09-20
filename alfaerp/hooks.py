@@ -8,32 +8,9 @@ app_license = "mit"
 
 
 fixtures = [
-  {
-        "dt": "DocType",
-        "filters": [
-            ["module", "=", "alfaerp"]
-        ]
-    },
+
     {
         "dt": "Web Page",
-        "filters": [
-            ["module", "=", "alfaerp"]
-        ]
-    },
-    {
-        "dt": "Client Script",
-        "filters": [
-            ["module", "=", "alfaerp"]
-        ]
-    },
-    {
-        "dt": "Server Script",
-        "filters": [
-            ["module", "=", "alfaerp"]
-        ]
-    },
-    {
-        "dt": "Web Form",
         "filters": [
             ["module", "=", "alfaerp"]
         ]
