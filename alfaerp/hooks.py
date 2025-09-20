@@ -5,6 +5,45 @@ app_description = "privacy policy & terms and condition web page app"
 app_email = "roshanramani.dev@gmail.com"
 app_license = "mit"
 
+
+
+fixtures = [
+  {
+        "dt": "DocType",
+        "filters": [
+            ["module", "=", "alfaerp"]
+        ]
+    },
+    {
+        "dt": "Web Page",
+        "filters": [
+            ["module", "=", "alfaerp"]
+        ]
+    },
+    {
+        "dt": "Client Script",
+        "filters": [
+            ["module", "=", "alfaerp"]
+        ]
+    },
+    {
+        "dt": "Server Script",
+        "filters": [
+            ["module", "=", "alfaerp"]
+        ]
+    },
+    {
+        "dt": "Web Form",
+        "filters": [
+            ["module", "=", "alfaerp"]
+        ]
+    }
+]
+
+
+
+
+
 # Apps
 # ------------------
 
