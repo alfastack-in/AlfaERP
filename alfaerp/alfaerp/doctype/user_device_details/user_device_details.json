@@ -34,15 +34,14 @@
    "in_list_view": 1,
    "label": "FCM Token",
    "length": 150,
-   "max_height": "55px",
-   "reqd": 1
+   "max_height": "55px"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-15 11:24:10.904451",
- "modified_by": "Administrator",
+ "modified": "2025-10-15 13:46:24.793562",
+ "modified_by": "alvishramani.dev@gmail.com",
  "module": "AlfaERP",
  "name": "User Device Details",
  "naming_rule": "By fieldname",

@@ -5,22 +5,22 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_8pbo",
+  "firebase_project_id",
   "service_account_info"
  ],
  "fields": [
-  {
-   "fieldname": "section_break_8pbo",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Firebase Project ID",
-   "reqd": 1
-  },
   {
    "fieldname": "service_account_info",
    "fieldtype": "JSON",
    "in_list_view": 1,
    "label": "Service Account Info",
+   "reqd": 1
+  },
+  {
+   "fieldname": "firebase_project_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Firebase Project ID",
    "reqd": 1
   }
  ],
@@ -28,7 +28,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-15 11:43:37.207732",
+ "modified": "2025-10-15 11:48:50.969372",
  "modified_by": "Administrator",
  "module": "AlfaERP",
  "name": "FCM Settings",
