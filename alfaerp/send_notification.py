@@ -4,29 +4,28 @@ import json
 from frappe import enqueue
 import re
 import os
-
 import google.auth.transport.requests
 from google.oauth2 import service_account
 
 
-def user_id(doc):
+def get_user_device_details_list(doc):
     user_email = doc.for_user
-    user_device_id = frappe.get_all(
+    user_device_details_list = frappe.get_all(
         "User Device Details", filters={"user": user_email}, fields=["fcm_token"]
     )
-    return user_device_id
+    return user_device_details_list
 
 
 @frappe.whitelist()
-def send_notification(doc,method=None):
-    device_ids = user_id(doc)
-    for device_id in device_ids:
+def send_notification(doc, method=None):
+    user_device_details_list = get_user_device_details_list(doc)
+    for device_details in user_device_details_list:
         enqueue(
             process_notification,
-            queue="default",
             now=False,
-            device_id=device_id,
+            queue="default",
             notification=doc,
+            fcm_token=device_details.fcm_token,
         )
 
 
@@ -36,7 +35,7 @@ def convert_message(message):
     return cleanmessage
 
 
-def process_notification(device_id, notification):
+def process_notification(fcm_token, notification):
     message = notification.email_content
     title = notification.subject
 
@@ -46,41 +45,33 @@ def process_notification(device_id, notification):
         title = convert_message(title)
 
     body = {
-        "message":{
-            "token": device_id.device_id,
-            "notification":{
-                "body": message,
-                "title": title
-            }
+        "message": {
+            "token": fcm_token,
+            "notification": {"body": message, "title": title},
         }
     }
 
     headers = {
-        'Authorization': 'Bearer ' + _get_access_token(),
-        'Content-Type': 'application/json; UTF-8',
+        "Authorization": "Bearer " + _get_access_token(),
+        "Content-Type": "application/json; UTF-8",
     }
 
-    req = requests.post(
-        url=FCM_URL,
-        data=json.dumps(body),
-        headers=headers
-    )
+    PROJECT_ID = frappe.db.get_single_value("FCM Settings", "firebase_project_id")
+    BASE_URL = "https://fcm.googleapis.com"
+    FCM_ENDPOINT = "v1/projects/" + PROJECT_ID + "/messages:send"
+    FCM_URL = BASE_URL + "/" + FCM_ENDPOINT
+
+    req = requests.post(url=FCM_URL, data=json.dumps(body), headers=headers)
     frappe.log_error(req.text)
 
-PROJECT_ID = 'alfaerp-bd38a'
-BASE_URL = 'https://fcm.googleapis.com'
-FCM_ENDPOINT = 'v1/projects/' + PROJECT_ID + '/messages:send'
-FCM_URL = BASE_URL + '/' + FCM_ENDPOINT
-SCOPES = ['https://www.googleapis.com/auth/firebase.messaging']
 
 def _get_access_token():
-    service_account_path = os.path.join(
-        frappe.get_app_path('fcm_notification'), 
-        'service-account.json'
+    service_account_info = frappe.db.get_single_value(
+        "FCM Settings", "service_account_info"
     )
-    credentials = service_account.Credentials.from_service_account_file(
-        service_account_path, 
-        scopes=SCOPES
+    credentials = service_account.Credentials.from_service_account_info(
+        json.loads(service_account_info),
+        scopes=["https://www.googleapis.com/auth/firebase.messaging"],
     )
     request = google.auth.transport.requests.Request()
     credentials.refresh(request)
