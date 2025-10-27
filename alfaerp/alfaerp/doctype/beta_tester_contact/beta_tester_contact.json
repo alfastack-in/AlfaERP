@@ -7,7 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
-  "name1",
+  "full_name",
   "email",
   "company",
   "phone",
@@ -22,13 +22,6 @@
    "in_list_view": 1,
    "label": "Id",
    "options": "AlfaERP-.#####"
-  },
-  {
-   "fieldname": "name1",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Name",
-   "reqd": 1
   },
   {
    "fieldname": "email",
@@ -65,13 +58,20 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-24 18:29:24.741948",
+ "modified": "2025-10-27 14:18:28.083832",
  "modified_by": "Administrator",
  "module": "AlfaERP",
  "name": "Beta Tester Contact",
