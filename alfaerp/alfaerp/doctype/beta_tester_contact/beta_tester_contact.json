@@ -40,7 +40,7 @@
   },
   {
    "fieldname": "phone",
-   "fieldtype": "Phone",
+   "fieldtype": "Data",
    "label": "Phone",
    "reqd": 1
   },
@@ -71,8 +71,8 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-27 14:18:28.083832",
- "modified_by": "Administrator",
+ "modified": "2025-10-31 14:55:19.198620",
+ "modified_by": "alvishramani.dev@gmail.com",
  "module": "AlfaERP",
  "name": "Beta Tester Contact",
  "naming_rule": "By \"Naming Series\" field",
