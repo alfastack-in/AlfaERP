@@ -1,12 +1,11 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "naming_series:",
+ "autoname": "format:HAS-{#####}",
  "creation": "2025-09-20 16:01:34.024263",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "naming_series",
   "email_address",
   "subject",
   "category",
@@ -14,14 +13,6 @@
   "description"
  ],
  "fields": [
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "label": "Id",
-   "options": "GRYP-.#####",
-   "read_only": 1
-  },
   {
    "fieldname": "email_address",
    "fieldtype": "Data",
@@ -61,11 +52,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-20 16:01:34.024263",
+ "modified": "2025-11-04 14:16:41.469755",
  "modified_by": "Administrator",
  "module": "AlfaERP",
  "name": "Help and Support",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
