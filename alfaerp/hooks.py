@@ -5,21 +5,20 @@ app_description = "privacy policy & terms and condition web page app"
 app_email = "roshanramani.dev@gmail.com"
 app_license = "mit"
 
-
-
 fixtures = [
-
     {
         "dt": "Web Page",
         "filters": [
             ["module", "=", "alfaerp"]
         ]
+    },
+    {
+        "doctype": "Custom DocPerm", 
+        "filters": [
+            ["name", "in", ["op1bp5b95i", "m061lekr2v"]]
+        ]
     }
 ]
-
-
-
-
 
 # Apps
 # ------------------
