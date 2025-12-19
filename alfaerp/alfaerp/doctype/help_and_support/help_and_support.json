@@ -8,9 +8,11 @@
  "field_order": [
   "email_address",
   "subject",
+  "description",
+  "column_break_czig",
   "category",
-  "screenshot",
-  "description"
+  "status",
+  "screenshot"
  ],
  "fields": [
   {
@@ -47,12 +49,23 @@
    "in_list_view": 1,
    "label": "Description",
    "reqd": 1
+  },
+  {
+   "fieldname": "column_break_czig",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nTriage Required\nAssigned for Triage\nIn Progress\nResolved\nCancelled"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-04 14:16:41.469755",
+ "modified": "2025-12-19 16:00:40.347625",
  "modified_by": "Administrator",
  "module": "AlfaERP",
  "name": "Help and Support",
@@ -75,5 +88,7 @@
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1
 }
