@@ -47,7 +47,16 @@ def process_notification(fcm_token, notification):
     body = {
         "message": {
             "token": fcm_token,
-            "notification": {"body": message, "title": title},
+            "notification": {
+                "title": title,
+                "body": message,
+            },
+            "data": {
+                "name": notification.name,
+                "type": notification.type,
+                "document_type": notification.document_type,
+                "document_name": notification.document_name,
+            }
         }
     }
 
