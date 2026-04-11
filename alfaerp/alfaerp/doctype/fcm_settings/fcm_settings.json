@@ -10,13 +10,16 @@
  ],
  "fields": [
   {
+   "default": "{\n  \"type\": \"service_account\",\n  \"project_id\": \"alfaerp-bd38a\",\n  \"private_key_id\": \"dbc6ee51d79ccabd573a77ba6bac267ef1a4ef23\",\n  \"private_key\": \"-----BEGIN PRIVATE KEY-----\\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjUw7YKHQAdY4O\\nLp9HKHOJ/IP+CcNu6dZVshesEb5WsjEw8xcGCMM2Xd3yZp1YceZX3PeiTluKMrjz\\na3NzwqZkN7KViJprOKJEBkDGdtj3n2Ot73iA4f3v+wjsW/sJIZoaYdtnAhZMy+wS\\nrvNgcdXzf3TaZTuGBr8jBeDOfQhpjSs5LbOABqJHD5GUTR+rv4Xqbk8+dIza9yMb\\ngfiefnqy36QOxLesERmGa6IloBtkXygkuK/ws76vXovoCX9werqQld7EoVb45pQ5\\njXgzDQnMWL8UpeP3H7bw20nRk5YwysK/ylGRPZpQHfJ2mBrIidN+iyqvEIR2LTL6\\nkO0o9OlFAgMBAAECggEANtLXpcmWftz3DV2rC6jRd90ytWCzoJSP5P4+If1mxhVU\\nm9jNvrHMTYCe0xKM+LZrGs1KtsnUwoQaP2OvQolxbyyfHsDXDOza0zjCH5yfYie3\\nvxgmfCTgJ+E9cpHBp6QG5Zo5ms9Biw/cs7zUZ2hu6Ci9od3faDL1kB0WBFpGK5+1\\nPLEN53AF+34auVPafWdXkuwfyfnDe2YwGKlGQ3odAHXSdZoOL0VsZXzTLKkoNEfD\\njVQSo8rq6PWcQr32OqPs509XIRXmrD1KQ45I7/dSYcq4uYx16BLqb+epqHKTGmAU\\nSGbbGyV5/wpSvq4gz+6VzCHC+fbAhVeqAWEW98AiVQKBgQDOpj2aRT+AHVBX510W\\nt458DOmn/b19LNlCvTR2kiVKzeo7DU50C6eCHwg42vODB1gLScbaN+Mvfv8hQfSw\\nu/vJEEdhRiaSfEJF2jHKM9kEvPC32XQzq1GORWVx2zITI01B2b6qs/ZVdD1+Jxll\\ndyJtUhfJwl3yly+DTo76L5eIxwKBgQDKVBhj4tyrH5BNheaZfiMh+U+C0QeGaNKm\\nWTyE3gR8+2t9nBZGH+8g7gBWtqwen/C2saNYKVNHroK1b1myvA7ctA2TE1adUMJw\\nmS/lXL/JU6Hbiw5Rn6+kF72OIv55vmdfxkB9MVAxXG/8fEN4g7eajfkV0sMWq5C8\\n0jLjzSqpkwKBgQCDeYD4BdbAy+WyB6FSMraUdiKynt1QJpiTvY0DYzgWv6umpnCj\\npEaOou+4PJVxZ9q8U9QQQj5omYP4xN3JE9C9u32uhdNEn4oKpyfGXfZU7WC5l8A2\\nn2jj+4LvTWYuhudAXijQsm6nL61v9bBSvdlJdFFuLBtZnJa+E90jj+P5QQKBgQDH\\nwommLPkT1wEBGT/Ysgn75AtVrA1S7jF0Xcx7njwuLYkuJipzp9nP2EvrUUXUorLl\\nnbMZOwvnTOvuOHcGGdhOnVJ9sG0muvKOeyAnww/ztSer+7nyasfeKjZTnEdFafDk\\nRXesY0C6y3ohfYqb9OgUpzGTE1jcDB3F336xHQKPEwKBgCfvOegIGUpVGyCmgbZe\\noHEfjHUBCsrV8JGjv1/sKtwHCJhhR7MrCYSdqMrDzh7GmqHbM3vKiEyevgeURHJM\\nUaXfPdNWdW7nHSKVvm3YsVuA9InIB2jXhIhFWhWXHY+KiZd2s3+HFsRUulyuzk/G\\nsXJorymdhaRFScotE4++6vzP\\n-----END PRIVATE KEY-----\\n\",\n  \"client_email\": \"firebase-adminsdk-fbsvc@alfaerp-bd38a.iam.gserviceaccount.com\",\n  \"client_id\": \"100042700813890477850\",\n  \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",\n  \"token_uri\": \"https://oauth2.googleapis.com/token\",\n  \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\n  \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40alfaerp-bd38a.iam.gserviceaccount.com\",\n  \"universe_domain\": \"googleapis.com\"\n}",
    "fieldname": "service_account_info",
    "fieldtype": "JSON",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Service Account Info",
    "reqd": 1
   },
   {
+   "default": "alfaerp-bd38a",
    "fieldname": "firebase_project_id",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -28,7 +31,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-15 11:48:50.969372",
+ "modified": "2026-04-11 13:39:26.983801",
  "modified_by": "Administrator",
  "module": "AlfaERP",
  "name": "FCM Settings",
