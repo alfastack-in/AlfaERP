@@ -65,7 +65,13 @@ def process_notification(fcm_token, notification):
         "Content-Type": "application/json; UTF-8",
     }
 
-    PROJECT_ID = frappe.db.get_single_value("FCM Settings", "firebase_project_id")
+    PROJECT_ID = frappe.conf.get("fcm_project_id")
+
+
+    ## Gotta Add these to the site_config.json (sites/<your-site>/site_config.json)
+    ##"fcm_project_id": "alfaerp-bd38a",
+    ##"fcm_service_account_info": "{\"type\": \"service_account\", ...}"
+
     BASE_URL = "https://fcm.googleapis.com"
     FCM_ENDPOINT = "v1/projects/" + PROJECT_ID + "/messages:send"
     FCM_URL = BASE_URL + "/" + FCM_ENDPOINT
@@ -75,9 +81,7 @@ def process_notification(fcm_token, notification):
 
 
 def _get_access_token():
-    service_account_info = frappe.db.get_single_value(
-        "FCM Settings", "service_account_info"
-    )
+    service_account_info = frappe.conf.get("fcm_service_account_info")
     credentials = service_account.Credentials.from_service_account_info(
         json.loads(service_account_info),
         scopes=["https://www.googleapis.com/auth/firebase.messaging"],
