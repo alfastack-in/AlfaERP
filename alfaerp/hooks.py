@@ -7,12 +7,6 @@ app_license = "mit"
 
 fixtures = [
     {
-        "dt": "Web Page",
-        "filters": [
-            ["module", "=", "alfaerp"]
-        ]
-    },
-    {
         "doctype": "Custom DocPerm", 
         "filters": [
             ["name", "in", ["op1bp5b95i", "m061lekr2v"]]
