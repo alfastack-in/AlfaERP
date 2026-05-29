@@ -9,7 +9,7 @@ def get_api_key_and_secret():
 		frappe.throw(_("Authentication required to access API credentials."), frappe.AuthenticationError)
 
 	user_details = frappe.get_doc("User", user)
-	api_key = user_details.get("api_key")
+	api_key = user_details.api_key
 	api_secret = None
 
 	if user_details.api_secret:
@@ -23,7 +23,7 @@ def get_api_key_and_secret():
 
 	if not api_secret:
 		api_secret = frappe.generate_hash(length=15)
-		user_details.api_secret = api_secret
+		user_details.set_password("api_secret", api_secret)
 		updated = True
 
 	if updated:
