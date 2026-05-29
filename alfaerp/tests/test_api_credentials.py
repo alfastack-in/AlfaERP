@@ -32,3 +32,15 @@ class TestApiCredentials(FrappeTestCase):
 		user = frappe.get_doc("User", self.user.name)
 		self.assertEqual(result["api_key"], user.api_key)
 		self.assertEqual(result["api_secret"], user.get_password("api_secret"))
+
+	def test_get_api_key_and_secret_returns_existing_credentials(self):
+		frappe.set_user(self.user.name)
+		first = get_api_key_and_secret()
+		second = get_api_key_and_secret()
+
+		self.assertEqual(first, second)
+
+	def test_get_api_key_and_secret_requires_authentication(self):
+		frappe.set_user("Guest")
+		with self.assertRaises(frappe.AuthenticationError):
+			get_api_key_and_secret()
