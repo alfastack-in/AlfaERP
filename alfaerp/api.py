@@ -1,3 +1,5 @@
+import secrets
+
 import frappe
 from frappe import _
 
@@ -14,12 +16,12 @@ def get_api_key_and_secret():
 
 	updated = False
 	if not api_key:
-		api_key = frappe.generate_hash(length=64)
+		api_key = secrets.token_hex(32)
 		user_details.api_key = api_key
 		updated = True
 
 	if not api_secret:
-		api_secret = frappe.generate_hash(length=64)
+		api_secret = secrets.token_hex(32)
 		user_details.set_password("api_secret", api_secret)
 		updated = True
 
