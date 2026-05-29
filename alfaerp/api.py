@@ -17,12 +17,12 @@ def get_api_key_and_secret():
 
 	updated = False
 	if not api_key:
-		api_key = frappe.generate_hash(length=15)
+		api_key = frappe.generate_hash(length=32)
 		user_details.api_key = api_key
 		updated = True
 
 	if not api_secret:
-		api_secret = frappe.generate_hash(length=15)
+		api_secret = frappe.generate_hash(length=32)
 		user_details.set_password("api_secret", api_secret)
 		updated = True
 
