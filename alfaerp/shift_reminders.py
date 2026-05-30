@@ -12,6 +12,8 @@ REMINDER_ACTIONS = {
 	"Check-In": "check in",
 	"Check-Out": "check out",
 }
+SUBJECT_TEMPLATE = "{reminder_type} Reminder: {shift_type} shift on {date}"
+MESSAGE_TEMPLATE = "Please remember to {action} for your {shift_type} shift scheduled on {date}."
 
 
 def send_shift_reminders() -> None:
@@ -26,6 +28,7 @@ def send_shift_reminders() -> None:
 	shift_field = _get_employee_checkin_shift_field()
 	logger = frappe.logger("shift_reminders")
 
+	# Include the previous day to catch overnight shifts that end after midnight.
 	for target_date in [current_date, add_days(current_date, -1)]:
 		for assignment in _get_active_shift_assignments(target_date):
 			employee_details = _get_employee_details(assignment.employee, employee_cache)
@@ -141,6 +144,7 @@ def _get_shift_window(
 	shift_start = datetime.combine(target_date, start_time)
 	shift_end = datetime.combine(target_date, end_time)
 	if shift_end <= shift_start:
+		# Overnight shift ends on the following day.
 		shift_end += timedelta(days=1)
 	return shift_start, shift_end
 
@@ -151,7 +155,7 @@ def _is_within_checkin_window(now: datetime, shift_start: datetime) -> bool:
 		CHECKIN_REMINDER_WINDOW_MINUTES,
 	)
 	window_start = shift_start - timedelta(minutes=window_minutes)
-	return window_start <= now <= shift_start
+	return window_start <= now < shift_start
 
 
 def _is_within_checkout_window(now: datetime, shift_end: datetime) -> bool:
@@ -160,7 +164,7 @@ def _is_within_checkout_window(now: datetime, shift_end: datetime) -> bool:
 		CHECKOUT_REMINDER_WINDOW_MINUTES,
 	)
 	window_end = shift_end + timedelta(minutes=window_minutes)
-	return shift_end <= now <= window_end
+	return shift_end <= now < window_end
 
 
 def _should_skip_employee(
@@ -281,13 +285,19 @@ def _send_reminder(
 	reminder_date: date,
 ) -> bool:
 	formatted_date = formatdate(reminder_date)
-	subject = f"{reminder_type} Reminder: {shift_type} shift on {formatted_date}"
+	subject = SUBJECT_TEMPLATE.format(
+		reminder_type=reminder_type,
+		shift_type=shift_type,
+		date=formatted_date,
+	)
 	action = REMINDER_ACTIONS.get(reminder_type, reminder_type.lower())
-	message = (
-		f"Please remember to {action} for your {shift_type} shift scheduled on {formatted_date}."
+	message = MESSAGE_TEMPLATE.format(
+		action=action,
+		shift_type=shift_type,
+		date=formatted_date,
 	)
 
-	if _notification_exists(user_id, assignment.name, subject):
+	if _notification_exists(user_id, assignment.name, reminder_type, reminder_date):
 		return False
 
 	notification = frappe.get_doc(
@@ -315,7 +325,15 @@ def _send_reminder(
 	return True
 
 
-def _notification_exists(user_id: str, assignment_name: str, subject: str) -> bool:
+def _notification_exists(
+	user_id: str,
+	assignment_name: str,
+	reminder_type: str,
+	reminder_date: date,
+) -> bool:
+	subject_prefix = f"{reminder_type} Reminder:"
+	start_of_day = datetime.combine(reminder_date, time.min)
+	end_of_day = datetime.combine(reminder_date, time.max)
 	return bool(
 		frappe.db.exists(
 			"Notification Log",
@@ -323,7 +341,8 @@ def _notification_exists(user_id: str, assignment_name: str, subject: str) -> bo
 				"for_user": user_id,
 				"document_type": "Shift Assignment",
 				"document_name": assignment_name,
-				"subject": subject,
+				"subject": ["like", f"{subject_prefix}%"],
+				"creation": ["between", [start_of_day, end_of_day]],
 			},
 		)
 	)
