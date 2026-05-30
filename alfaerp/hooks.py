@@ -155,23 +155,13 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"alfaerp.tasks.all"
-# 	],
-# 	"daily": [
-# 		"alfaerp.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"alfaerp.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"alfaerp.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"alfaerp.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"cron": {
+		"*/15 * * * *": [
+			"alfaerp.shift_reminders.send_shift_reminders",
+		],
+	}
+}
 
 # Testing
 # -------
@@ -248,4 +238,3 @@ doc_events = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
