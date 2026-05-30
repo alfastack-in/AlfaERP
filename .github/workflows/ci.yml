@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, version-*]
+  pull_request:
+    branches: [develop, version-*]
+
+jobs:
+  test:
+    name: CI
+    runs-on: ubuntu-latest
+    
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        options: --health-cmd="mysqladmin ping" --health-interval=10s
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Set up bench
+        run: |
+          pip install frappe-bench
+          bench init --skip-redis-config-generation frappe-bench
+          cd frappe-bench
+          bench get-app your_app $GITHUB_WORKSPACE
+
+      - name: Run tests
+        run: |
+          cd frappe-bench
+          bench --site test_site run-tests --app your_app

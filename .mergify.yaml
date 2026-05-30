@@ -1,0 +1,102 @@
+# .mergify.yml
+
+pull_request_rules:
+
+  # ── MERGE METHOD RULES ──────────────────────────────────────────
+
+  # Rule 1: Regular merge (no squash label)
+  - name: auto merge (regular)
+    conditions:
+      - base = develop
+      - label != dont-merge
+      - label != squash
+      - "#approved-reviews-by >= 1"
+      - check-success = CI
+    actions:
+      merge:
+        method: merge
+
+  # Rule 2: Squash merge (squash label present)
+  - name: auto merge (squash)
+    conditions:
+      - base = develop
+      - label = squash
+      - "#approved-reviews-by >= 1"
+      - check-success = CI
+    actions:
+      merge:
+        method: squash
+
+  # ── BACKPORT RULES ──────────────────────────────────────────────
+
+  # Backport to version-15-hotfix
+  - name: backport to version-15-hotfix
+    conditions:
+      - merged
+      - label = "backport version-15-hotfix"
+    actions:
+      backport:
+        branches:
+          - version-15-hotfix
+        assignees:
+          - "{{ author }}"
+
+  # Backport to version-15 (direct urgent pick)
+  - name: backport to version-15
+    conditions:
+      - merged
+      - label = "backport version-15"
+    actions:
+      backport:
+        branches:
+          - version-15
+
+  # Backport to version-16-hotfix
+  - name: backport to version-16-hotfix
+    conditions:
+      - merged
+      - label = "backport version-16-hotfix"
+    actions:
+      backport:
+        branches:
+          - version-16-hotfix
+        assignees:
+          - "{{ author }}"
+
+  # Backport to version-16 (direct urgent pick)
+  - name: backport to version-16
+    conditions:
+      - merged
+      - label = "backport version-16"
+    actions:
+      backport:
+        branches:
+          - version-16
+
+  # ── AUTO-MERGE MERGIFY BACKPORT PRs ─────────────────────────────
+
+  # Auto-merge bot-created backport PRs after CI passes
+  - name: auto merge backport PRs from mergify bot
+    conditions:
+      - author = mergify[bot]
+      - base ~= ^version-
+      - check-success = CI
+      - "#approved-reviews-by >= 1"
+    actions:
+      merge:
+        method: merge
+
+  # ── WRONG BRANCH GUARD ──────────────────────────────────────────
+
+  # Reject PRs opened directly against stable branches
+  - name: close PRs not from mergify on stable branches
+    conditions:
+      - base ~= ^version-
+      - author != mergify[bot]
+    actions:
+      close: {}
+      comment:
+        message: |
+          Hi @{{ author }}! Please open all PRs against the `develop` branch.
+          Stable version branches only receive changes via automated backports.
+          See our contributing guide for details.
