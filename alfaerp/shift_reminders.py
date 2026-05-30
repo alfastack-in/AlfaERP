@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, time, timedelta
 
 import frappe
-from frappe.utils import add_days, getdate, now_datetime
+from frappe.utils import add_days, formatdate, getdate, now_datetime
 
 CHECKIN_REMINDER_WINDOW_MINUTES = 15
 CHECKOUT_REMINDER_WINDOW_MINUTES = 15
@@ -25,7 +25,7 @@ def send_shift_reminders() -> None:
 	shift_field = _get_employee_checkin_shift_field()
 	logger = frappe.logger("shift_reminders")
 
-	for target_date in {current_date, add_days(current_date, -1)}:
+	for target_date in [current_date, add_days(current_date, -1)]:
 		for assignment in _get_active_shift_assignments(target_date):
 			employee_details = _get_employee_details(assignment.employee, employee_cache)
 			if not employee_details or not employee_details.user_id:
@@ -145,12 +145,24 @@ def _get_shift_window(
 
 
 def _is_within_checkin_window(now: datetime, shift_start: datetime) -> bool:
-	window_start = shift_start - timedelta(minutes=CHECKIN_REMINDER_WINDOW_MINUTES)
+	window_minutes = int(
+		frappe.conf.get(
+			"shift_checkin_reminder_minutes",
+			CHECKIN_REMINDER_WINDOW_MINUTES,
+		)
+	)
+	window_start = shift_start - timedelta(minutes=window_minutes)
 	return window_start <= now <= shift_start
 
 
 def _is_within_checkout_window(now: datetime, shift_end: datetime) -> bool:
-	window_end = shift_end + timedelta(minutes=CHECKOUT_REMINDER_WINDOW_MINUTES)
+	window_minutes = int(
+		frappe.conf.get(
+			"shift_checkout_reminder_minutes",
+			CHECKOUT_REMINDER_WINDOW_MINUTES,
+		)
+	)
+	window_end = shift_end + timedelta(minutes=window_minutes)
 	return shift_end <= now <= window_end
 
 
@@ -271,9 +283,12 @@ def _send_reminder(
 	reminder_type: str,
 	reminder_date: date,
 ) -> bool:
-	subject = f"{reminder_type} Reminder: {shift_type} shift on {reminder_date}"
+	formatted_date = formatdate(reminder_date)
+	subject = f"{reminder_type} Reminder: {shift_type} shift on {formatted_date}"
 	action = REMINDER_ACTIONS.get(reminder_type, reminder_type.lower())
-	message = f"Please remember to {action} for your {shift_type} shift scheduled on {reminder_date}."
+	message = (
+		f"Please remember to {action} for your {shift_type} shift scheduled on {formatted_date}."
+	)
 
 	if _notification_exists(user_id, assignment.name, subject):
 		return False
