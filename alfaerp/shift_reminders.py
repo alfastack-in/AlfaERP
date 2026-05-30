@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import frappe
 from frappe.utils import add_days, getdate, now_datetime
@@ -107,7 +107,7 @@ def send_shift_reminders() -> None:
 					)
 
 
-def _get_active_shift_assignments(target_date) -> list[frappe._dict]:
+def _get_active_shift_assignments(target_date: date) -> list[frappe._dict]:
 	return frappe.get_all(
 		"Shift Assignment",
 		filters=[
@@ -142,7 +142,7 @@ def _is_within_checkout_window(now: datetime, shift_end: datetime) -> bool:
 
 def _should_skip_employee(
 	employee: str,
-	reminder_date,
+	reminder_date: date,
 	employee_cache: dict[str, frappe._dict],
 	holiday_list_cache: dict[tuple[str, str | None], str | None],
 	holiday_cache: dict[tuple[str, str], bool],
@@ -166,7 +166,10 @@ def _should_skip_employee(
 	return False
 
 
-def _get_employee_details(employee: str, employee_cache: dict[str, frappe._dict]):
+def _get_employee_details(
+	employee: str,
+	employee_cache: dict[str, frappe._dict],
+) -> frappe._dict | None:
 	if employee in employee_cache:
 		return employee_cache[employee]
 	employee_details = frappe.db.get_value(
@@ -181,7 +184,7 @@ def _get_employee_details(employee: str, employee_cache: dict[str, frappe._dict]
 
 def _is_employee_on_holiday(
 	employee_details: frappe._dict,
-	reminder_date,
+	reminder_date: date,
 	holiday_list_cache: dict[tuple[str, str | None], str | None],
 	holiday_cache: dict[tuple[str, str], bool],
 ) -> bool:
@@ -213,7 +216,7 @@ def _is_employee_on_holiday(
 
 def _is_employee_on_leave(
 	employee: str,
-	reminder_date,
+	reminder_date: date,
 	leave_cache: dict[tuple[str, str], bool],
 ) -> bool:
 	cache_key = (employee, str(reminder_date))
@@ -251,7 +254,12 @@ def _has_employee_log(
 	return bool(frappe.db.exists("Employee Checkin", filters))
 
 
-def _send_reminder(assignment, shift_type: str, reminder_type: str, reminder_date) -> bool:
+def _send_reminder(
+	assignment: frappe._dict,
+	shift_type: str,
+	reminder_type: str,
+	reminder_date: date,
+) -> bool:
 	employee_details = frappe.db.get_value(
 		"Employee", assignment.employee, ["user_id"], as_dict=True
 	)
@@ -260,8 +268,8 @@ def _send_reminder(assignment, shift_type: str, reminder_type: str, reminder_dat
 
 	subject = f"{reminder_type} Reminder: {shift_type} shift on {reminder_date}"
 	message = (
-		f"Please remember to {reminder_type.lower()} for your {shift_type} shift scheduled on"
-		f" {reminder_date}."
+		f"Please remember to {reminder_type.lower()} for your {shift_type} shift scheduled on "
+		f"{reminder_date}."
 	)
 
 	if _notification_exists(employee_details.user_id, assignment.name, subject):
