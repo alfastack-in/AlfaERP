@@ -5,8 +5,9 @@ from datetime import date, datetime, time, timedelta
 import frappe
 from frappe.utils import add_days, formatdate, getdate, now_datetime
 
-CHECKIN_REMINDER_WINDOW_MINUTES = 15
-CHECKOUT_REMINDER_WINDOW_MINUTES = 15
+DEFAULT_REMINDER_WINDOW_MINUTES = 15
+CHECKIN_REMINDER_WINDOW_MINUTES = DEFAULT_REMINDER_WINDOW_MINUTES
+CHECKOUT_REMINDER_WINDOW_MINUTES = DEFAULT_REMINDER_WINDOW_MINUTES
 REMINDER_ACTIONS = {
 	"Check-In": "check in",
 	"Check-Out": "check out",
@@ -145,22 +146,18 @@ def _get_shift_window(
 
 
 def _is_within_checkin_window(now: datetime, shift_start: datetime) -> bool:
-	window_minutes = int(
-		frappe.conf.get(
-			"shift_checkin_reminder_minutes",
-			CHECKIN_REMINDER_WINDOW_MINUTES,
-		)
+	window_minutes = _get_window_minutes(
+		"shift_checkin_reminder_minutes",
+		CHECKIN_REMINDER_WINDOW_MINUTES,
 	)
 	window_start = shift_start - timedelta(minutes=window_minutes)
 	return window_start <= now <= shift_start
 
 
 def _is_within_checkout_window(now: datetime, shift_end: datetime) -> bool:
-	window_minutes = int(
-		frappe.conf.get(
-			"shift_checkout_reminder_minutes",
-			CHECKOUT_REMINDER_WINDOW_MINUTES,
-		)
+	window_minutes = _get_window_minutes(
+		"shift_checkout_reminder_minutes",
+		CHECKOUT_REMINDER_WINDOW_MINUTES,
 	)
 	window_end = shift_end + timedelta(minutes=window_minutes)
 	return shift_end <= now <= window_end
@@ -304,7 +301,17 @@ def _send_reminder(
 			"email_content": message,
 		}
 	)
-	notification.insert(ignore_permissions=True)
+	try:
+		notification.insert(ignore_permissions=True)
+	except Exception:
+		frappe.logger("shift_reminders").exception(
+			"Failed to insert shift reminder notification",
+			user_id=user_id,
+			shift_assignment=assignment.name,
+			reminder_type=reminder_type,
+		)
+		return False
+
 	return True
 
 
@@ -329,3 +336,17 @@ def _get_employee_checkin_shift_field() -> str | None:
 	if meta.has_field("shift"):
 		return "shift"
 	return None
+
+
+def _get_window_minutes(config_key: str, default_minutes: int) -> int:
+	raw_value = frappe.conf.get(config_key, default_minutes)
+	try:
+		return int(raw_value)
+	except (TypeError, ValueError):
+		frappe.logger("shift_reminders").warning(
+			"Invalid shift reminder window setting, using default",
+			config_key=config_key,
+			value=raw_value,
+			default=default_minutes,
+		)
+		return default_minutes
