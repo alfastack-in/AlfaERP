@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 import frappe
 from frappe.utils import add_days, getdate, now_datetime
 
 CHECKIN_REMINDER_WINDOW_MINUTES = 15
 CHECKOUT_REMINDER_WINDOW_MINUTES = 15
+REMINDER_ACTIONS = {
+	"Check-In": "check in",
+	"Check-Out": "check out",
+}
 
 
 def send_shift_reminders() -> None:
@@ -23,6 +27,10 @@ def send_shift_reminders() -> None:
 
 	for target_date in {current_date, add_days(current_date, -1)}:
 		for assignment in _get_active_shift_assignments(target_date):
+			employee_details = _get_employee_details(assignment.employee, employee_cache)
+			if not employee_details or not employee_details.user_id:
+				continue
+
 			shift_type = assignment.shift_type
 			shift_times = shift_type_cache.get(shift_type)
 			if not shift_times:
@@ -42,8 +50,8 @@ def send_shift_reminders() -> None:
 				reminder_date = shift_start.date()
 				if _should_skip_employee(
 					assignment.employee,
+					employee_details,
 					reminder_date,
-					employee_cache,
 					holiday_list_cache,
 					holiday_cache,
 					leave_cache,
@@ -60,6 +68,7 @@ def send_shift_reminders() -> None:
 					continue
 				if _send_reminder(
 					assignment,
+					employee_details.user_id,
 					shift_type,
 					"Check-In",
 					reminder_date,
@@ -76,8 +85,8 @@ def send_shift_reminders() -> None:
 				reminder_date = shift_end.date()
 				if _should_skip_employee(
 					assignment.employee,
+					employee_details,
 					reminder_date,
-					employee_cache,
 					holiday_list_cache,
 					holiday_cache,
 					leave_cache,
@@ -94,6 +103,7 @@ def send_shift_reminders() -> None:
 					continue
 				if _send_reminder(
 					assignment,
+					employee_details.user_id,
 					shift_type,
 					"Check-Out",
 					reminder_date,
@@ -122,7 +132,11 @@ def _get_active_shift_assignments(target_date: date) -> list[frappe._dict]:
 	)
 
 
-def _get_shift_window(target_date, start_time, end_time) -> tuple[datetime, datetime]:
+def _get_shift_window(
+	target_date: date,
+	start_time: time,
+	end_time: time,
+) -> tuple[datetime, datetime]:
 	shift_start = datetime.combine(target_date, start_time)
 	shift_end = datetime.combine(target_date, end_time)
 	if shift_end <= shift_start:
@@ -142,16 +156,12 @@ def _is_within_checkout_window(now: datetime, shift_end: datetime) -> bool:
 
 def _should_skip_employee(
 	employee: str,
+	employee_details: frappe._dict,
 	reminder_date: date,
-	employee_cache: dict[str, frappe._dict],
 	holiday_list_cache: dict[tuple[str, str | None], str | None],
 	holiday_cache: dict[tuple[str, str], bool],
 	leave_cache: dict[tuple[str, str], bool],
 ) -> bool:
-	employee_details = _get_employee_details(employee, employee_cache)
-	if not employee_details or not employee_details.user_id:
-		return True
-
 	if _is_employee_on_holiday(
 		employee_details,
 		reminder_date,
@@ -256,29 +266,22 @@ def _has_employee_log(
 
 def _send_reminder(
 	assignment: frappe._dict,
+	user_id: str,
 	shift_type: str,
 	reminder_type: str,
 	reminder_date: date,
 ) -> bool:
-	employee_details = frappe.db.get_value(
-		"Employee", assignment.employee, ["user_id"], as_dict=True
-	)
-	if not employee_details or not employee_details.user_id:
-		return False
-
 	subject = f"{reminder_type} Reminder: {shift_type} shift on {reminder_date}"
-	message = (
-		f"Please remember to {reminder_type.lower()} for your {shift_type} shift scheduled on "
-		f"{reminder_date}."
-	)
+	action = REMINDER_ACTIONS.get(reminder_type, reminder_type.lower())
+	message = f"Please remember to {action} for your {shift_type} shift scheduled on {reminder_date}."
 
-	if _notification_exists(employee_details.user_id, assignment.name, subject):
+	if _notification_exists(user_id, assignment.name, subject):
 		return False
 
 	notification = frappe.get_doc(
 		{
 			"doctype": "Notification Log",
-			"for_user": employee_details.user_id,
+			"for_user": user_id,
 			"type": "Alert",
 			"document_type": "Shift Assignment",
 			"document_name": assignment.name,
