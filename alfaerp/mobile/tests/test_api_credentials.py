@@ -1,7 +1,7 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from alfaerp.api import get_api_key_and_secret
+from alfaerp.mobile.api import get_api_key_and_secret
 
 
 class TestApiCredentials(FrappeTestCase):
